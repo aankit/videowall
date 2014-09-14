@@ -20,32 +20,33 @@
 		</style>
 	</head>
 	<body>
-		<canvas id="canvas"></canvas>
 		<script>
 			
-var playing = false;
-var fingers;
-var button;
+			var playing = false;
+			var fingers;
+			var button;
 
 
-function setup() {
-  // specify multiple formats for different browsers
-  fingers = createVideo('Sequence01.mov');
-  button = createButton('play');
-  button.mousePressed(toggleVid); // attach button listener
-}
+			function setup() {
+			  createCanvas(window.innerWidth, window.innerHeight)
+			  console.log(window.innerWidth, window.innerHeight)
+			  // specify multiple formats for different browsers
+			  sequence = createVideo('Sequence01.mov');
+			  button = createButton('play');
+			  button.mousePressed(toggleVid); // attach button listener
+			}
 
-// plays or pauses the video depending on current state
-function toggleVid() {
-  if (playing) {
-    fingers.pause();
-    button.html('play');
-  } else {
-    fingers.loop();
-    button.html('pause');
-  }
-  playing = !playing;
-}
+			// plays or pauses the video depending on current state
+			function toggleVid() {
+			  if (playing) {
+			    sequence.pause();
+			    button.html('play');
+			  } else {
+			    sequence.loop();
+			    button.html('pause');
+			  }
+			  playing = !playing;
+			}
 
 
 
