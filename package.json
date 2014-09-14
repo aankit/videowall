@@ -1,0 +1,14 @@
+{
+  "name": "screensFlyBy",
+  "version": "0.0.1",
+  "description": "bounce around",
+  "main": "app.js",
+  "author": "Andy Sigler",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "express": "^4.1.2",
+    "ws": "^0.4.31"
+  }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/p5.js/0.2.2/p5.min.js"></script>
+		<style>
+			body{
+				margin: 0px 0px 0px 0px;
+				padding: 0px 0px 0px 0px;
+				background-color: black;
+			}
+			canvas{
+				position:absolute;
+				left:0px;
+				top:0px;
+				width:100%;
+				height:100%;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			var host = location.origin.replace(/^http/, 'ws');
+			var ws = new WebSocket(host);
+
+			ws.onopen = function(){
+				console.log('connected over websockets');
+			};
+
+			ws.onmessage = function(msg){
+				console.log(msg.data);
+				var data = JSON.parse(msg.data);
+				var newBall = {
+					'x' : data.x,
+					'y' : data.y,
+					'xSpeed' : data.xSpeed,
+					'ySpeed' : data.ySpeed,
+					'r' : data.r,
+					'g' : data.g,
+					'b': data.b
+				};
+				if(newBall.xSpeed>0) newBall.x = 0;
+				else newBall.x = 1;
+
+				allBalls.push(newBall);
+			}
+
+			function setup(){
+				console.log("setup Processing");
+				var canvas = createCanvas(window.innerWidth, window.innerHeight);
+				canvas.mousePressed( makeRandomBall );
+			}
+
+			function draw(){
+				background(0);
+				for(var i=0;i<allBalls.length;i++){
+					// update the position
+					allBalls[i].x += allBalls[i].xSpeed;
+					allBalls[i].y += allBalls[i].ySpeed;
+					//check if we've hit the walls or ceiling
+					if(allBalls[i].y<0 || allBalls[i].y>1){
+						allBalls[i].ySpeed *= -1;
+						allBalls[i].y += allBalls[i].ySpeed;
+					}
+					if(allBalls[i].x<0 || allBalls[i].x>1){
+						// turn the ball into a JSON string to be sent
+						var jsonThing = JSON.stringify( allBalls[i] );
+						ws.send(jsonThing);
+						allBalls.splice(i,1); // we erase it
+						i--;
+					}
+					else{
+						// set the fill to be this ball's color
+						fill( allBalls[i].r , allBalls[i].g , allBalls[i].b );
+						// draw the ball, mapping it to the screen's size
+						ellipse(allBalls[i].x*width,allBalls[i].y*height,30,30);
+					}
+				}
+			}
+
+			var allBalls = [];
+
+			function makeRandomBall(){
+				var newBall = {
+					'x' : mouseX/width,
+					'y' : mouseY/height,
+					'xSpeed' : random(0.01,0.02),
+					'ySpeed' : random(0.01,0.02),
+					'r' : random(255),
+					'g' : random(255),
+					'b': random(255)
+				};
+
+				allBalls.push(newBall);
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		</script>
+	</body>
+</html>
