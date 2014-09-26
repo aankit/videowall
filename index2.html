@@ -1,0 +1,67 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+		<title>Video/Canvas Demo 1</title>
+		<style>
+			body{
+				background-color: black;
+				margin: 0px 0px 0px 0px;
+				padding: 0px 0px 0px 0px;
+			}
+			canvas{
+				position:absolute;
+				left:0px;
+				top:0px;
+				width:100%;
+				height:100%;
+			}
+		</style>
+	</head>
+<body>
+	<script> 
+	var host = location.origin.replace(/^http/,'ws');
+	console.log(host);
+	var ws = new WebSocket(host);
+
+	ws.onopen = function(){
+		//something to do when we open the websocket connection
+		//we need the x & y for drawImage function
+		init();
+	}
+
+	ws.onmessage = function(msg){
+		//what kind of messages will we be getting?
+		//what video should we play? get this as a string
+
+	}
+
+	function init(){
+		console.log("hello");
+		var v = document.getElementById('v');
+		var canvas = document.getElementById('c');
+		var context = canvas.getContext('2d');
+	 
+		var cw = canvas.clientWidth;
+		var ch = canvas.clientHeight;
+		canvas.width = cw;
+		canvas.height = ch;
+	 
+		v.addEventListener('play', function(){
+			draw(this,context,cw,ch);
+		},false);
+	 
+	};
+	 
+	function draw(v,c,w,h) {
+		if(v.paused || v.ended)	return false;
+		c.drawImage(v,0,0,w,h);
+		setTimeout(draw,20,v,c,w,h);
+	}
+	</script> 
+	 
+	 
+	<canvas id='c' height="2800" width="2800"></canvas> 
+	<video id='v' height="0" width="0" autoplay controls loop> 
+		<source src='Sequence01.mov' type='video/mp4'>  
+	</video> 
+  

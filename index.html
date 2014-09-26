@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="//cdn.jsdelivr.net/p5.js/0.3.6/p5.min.js"></script>
-		<script src="//cdn.jsdelivr.net/p5.js/0.3.6/addons/p5.dom.js"></script>
+		<!--script src="//cdn.jsdelivr.net/p5.js/0.3.6/p5.min.js"></script>
+		<script src="//cdn.jsdelivr.net/p5.js/0.3.6/addons/p5.dom.js"></script-->
 		<title>Fly By Screens</title>
 		<style>
 			body{
@@ -10,34 +10,71 @@
 				margin: 0px 0px 0px 0px;
 				padding: 0px 0px 0px 0px;
 			}
-			canvas{
-				position:absolute;
-				left:0px;
-				top:0px;
-				width:100%;
-				height:100%;
+			#c {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#v {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin: -180px 0 0 -240px;
 			}
 		</style>
 	</head>
 	<body>
-		<video width="960" height="960" controls>
+		<canvas id="c"></canvas>
+		<video id="v" controls loop>
   			<source src="Sequence01.mov" type="video/mp4">
 		Your browser does not support the video tag.
 		</video>
-		<!--script>
+		<script>
 			
-			var playing = false;
-			var fingers;
-			var button;
+			// var playing = false;
+			// var sequence;
+			// var button;
+			document.addEventListener('DOMContentLoaded', function(){
+				var v = document.getElementById('v');
+				var canvas = document.getElementById('c');
+				var context = canvas.getContext('2d');
 
+				var cw = canvas.clientWidth;
+				var ch = canvas.clientHeight;
+				canvas.width = cw;
+				canvas.height = ch;
 
-			function setup() {
-			  createCanvas(window.innerWidth, window.innerHeight)
-			  console.log(window.innerWidth, window.innerHeight)
+				v.addEventListener('play', function(){
+					drawTheVid(this,context,cw,ch);
+				},false);
+
+			},false);
+
+			function drawTheVid(v,c,w,h) {
+				if(v.paused || v.ended) return false;
+				c.drawImage(v,0,0,w,h);
+				setTimeout(draw,20,v,c,w,h);
+			}
+
+			/*function setup() {
+			  //createCanvas(window.innerWidth, window.innerHeight)
+			  console.log("setup")
+			  var v = document.getElementByID("v");
 			  // specify multiple formats for different browsers
-			  sequence = createVideo('Sequence01.mov');
-			  button = createButton('play');
-			  button.mousePressed(toggleVid); // attach button listener
+			  //sequence = createVideo('Sequence01.mov');
+			  //sequence.loop();
+			  // button = createButton('play');
+			  // button.mousePressed(toggleVid); // attach button listener
+			}
+
+			function draw(){
+				console.log("drawing");
+				drawImage(v,0,0, window.innerWidth, window.innerHeight);
 			}
 
 			// plays or pauses the video depending on current state
@@ -50,10 +87,7 @@
 			    button.html('pause');
 			  }
 			  playing = !playing;
-			}
-
-
-
-		</script-->
+			}*/
+		</script>
 	</body>
 </html>
