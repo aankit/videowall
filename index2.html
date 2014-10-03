@@ -1,7 +1,7 @@
 <!DOCTYPE html> 
 <html>
 	<head>
-		<title>Video/Canvas Demo 1</title>
+		<title>Environmental Fluid Dynamics</title>
 		<style>
 			body{
 				background-color: black;
@@ -10,58 +10,99 @@
 			}
 			canvas{
 				position:absolute;
-				left:0px;
-				top:0px;
-				width:100%;
-				height:100%;
+				margin:0;
+				height: 300%;
+				width:300%;
 			}
 		</style>
+		<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
 	</head>
 <body>
+	<video id='v' height="0" width="0"> 
+		<source id="movie" src='' type='video/mp4'>  
+	</video> 
+	<canvas id='c'></canvas>
 	<script> 
 	var host = location.origin.replace(/^http/,'ws');
 	console.log(host);
 	var ws = new WebSocket(host);
+	var rows = 3;
+	var cols = 3;
 
 	ws.onopen = function(){
 		//something to do when we open the websocket connection
 		//we need the x & y for drawImage function
-		init();
+		var initializeServer = {
+			'type': 'first'
+		}
+		ws.send(JSON.stringify(initializeServer));
+		//console.log(source);
 	}
 
 	ws.onmessage = function(msg){
 		//what kind of messages will we be getting?
 		//what video should we play? get this as a string
-
+		var data = JSON.parse(msg.data);
+		if(data){
+			console.log('got the vid')
+			var v = document.getElementById('v');
+			var canvas = document.getElementById('c');
+			var context = canvas.getContext('2d');
+			init(v, canvas, context, data);
+		}
 	}
 
-	function init(){
-		console.log("hello");
-		var v = document.getElementById('v');
-		var canvas = document.getElementById('c');
-		var context = canvas.getContext('2d');
-	 
-		var cw = canvas.clientWidth;
-		var ch = canvas.clientHeight;
+	//adding a video begin event listener that we will use to tell the server that the video has started playing
+
+	function init(v, canvas, context, data){
+		var cw = window.innerWidth*3;
+		var ch = window.innerHeight*3;
 		canvas.width = cw;
 		canvas.height = ch;
-	 
+	 	
+		document.getElementById('movie').src = data.videoSource;
+		console.log(data.mode);
+		if(data.mode==='all'){
+			row = Math.floor(data.screenNum/cols)
+			col = data.screenNum-row*cols;
+			offsetX = -col*window.innerWidth;
+			offsetY = -row*window.innerHeight;
+			context.transform(1,0,0,1,offsetX, offsetY);	
+		}
+
+		//draw to canvas
 		v.addEventListener('play', function(){
-			draw(this,context,cw,ch);
+			draw(this,context, cw, ch);
 		},false);
+
+		//need to change the video
+		v.addEventListener('ended', function(){
+			console.log("it ended!");
+		},false);
+		
+		//load and play the video
+		v.load();
+		v.play();
 	 
 	};
 	 
-	function draw(v,c,w,h) {
+	function draw(v,c,cw,ch) {
 		if(v.paused || v.ended)	return false;
-		c.drawImage(v,0,0,w,h);
-		setTimeout(draw,20,v,c,w,h);
+		var tempData = {
+			'type': 'update',
+			'duration': v.duration,
+			'current': v.currentTime
+		}
+		ws.send(JSON.stringify(tempData));
+		// c.scale(.5,.5);
+		console.log(cw, ch);
+		c.drawImage(v,0,0,cw,ch);
+		setTimeout(draw,20,v,c,cw,ch);
 	}
+
 	</script> 
-	 
-	 
-	<canvas id='c' height="2800" width="2800"></canvas> 
-	<video id='v' height="0" width="0" autoplay controls loop> 
-		<source src='Sequence01.mov' type='video/mp4'>  
-	</video> 
+
+	
+</body>
+	
   
