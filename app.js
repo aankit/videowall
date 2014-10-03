@@ -89,7 +89,7 @@ var socketHandlers = {
 				var scr = screens.socket;
 				console.log(screens.socket);
 				var vidData = {
-					'videoSource': vidFiles[scr],
+					'videoSource': vidFiles[1],
 					'mode': 'all',
 					'screenNum': scr
 				};
