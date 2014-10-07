@@ -16,6 +16,9 @@
 			}
 		</style>
 		<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+		<script>
+
+		</script>
 	</head>
 <body>
 	<video id='v' height="0" width="0"> 
@@ -33,7 +36,9 @@
 		//something to do when we open the websocket connection
 		//we need the x & y for drawImage function
 		var initializeServer = {
-			'type': 'first'
+			'type': 'first',
+			'windowX': window.innerWidth,
+			'windowY': window.innerHeight
 		}
 		ws.send(JSON.stringify(initializeServer));
 		//console.log(source);
@@ -61,7 +66,6 @@
 		canvas.height = ch;
 	 	
 		document.getElementById('movie').src = data.videoSource;
-		console.log(data.mode);
 		if(data.mode==='all'){
 			row = Math.floor(data.screenNum/cols)
 			col = data.screenNum-row*cols;
@@ -79,7 +83,7 @@
 		v.addEventListener('ended', function(){
 			console.log("it ended!");
 		},false);
-		
+
 		//load and play the video
 		v.load();
 		v.play();
@@ -88,6 +92,14 @@
 	 
 	function draw(v,c,cw,ch) {
 		if(v.paused || v.ended)	return false;
+		var w = window.outerWidth;
+	    var h = window.outerHeight;
+	    var sizeData = {
+	    	'type': 'size',
+	    	'w': w,
+	    	'h': h
+	    };
+	    ws.send(JSON.stringify(sizeData));
 		var tempData = {
 			'type': 'update',
 			'duration': v.duration,
@@ -99,6 +111,7 @@
 		c.drawImage(v,0,0,cw,ch);
 		setTimeout(draw,20,v,c,cw,ch);
 	}
+
 
 	</script> 
 

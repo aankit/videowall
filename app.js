@@ -79,6 +79,7 @@ socketServer.on('connection',function(socket){
 
 var socketHandlers = {
 	'update': function(socket, msg){
+		//console.log(msg.someShit);
 		// console.log(msg.duration);
 		// console.log(msg.current);
 	},
@@ -96,6 +97,10 @@ var socketHandlers = {
 				allSockets[i].send(JSON.stringify(vidData));
 			}
 		}
+	},
+	'size': function(socket, msg){
+		console.log(msg.w);
+		console.log(msg.h);
 	},
 	'passAlong':function(socket,msg){
 		for(var i=0;i<allSockets.length;i++){
