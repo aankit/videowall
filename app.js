@@ -14,6 +14,9 @@ var screens = {};
 var screenNum;
 var vidFiles = ['Sequence01.mov', 'Sequence02.mov', 'Sequence03.mov', 'Sequence04.mov'];
 var modes = ['all', 'single'];
+var screenSize = {};
+var rows;
+var cols;
 
 // we are only using one route, which simply returns the file the browser asks for
 app.use('/current', function(req, res, next){
@@ -84,6 +87,8 @@ var socketHandlers = {
 		// console.log(msg.current);
 	},
 	'first': function(socket, msg){
+		rows = msg.rows;
+		cols = msg.cols;
 		for(var i=0;i<allSockets.length;i++){
 			if(allSockets[i]===socket){
 				//look up what I should be playing on this screen
@@ -99,8 +104,9 @@ var socketHandlers = {
 		}
 	},
 	'size': function(socket, msg){
-		console.log(msg.w);
-		console.log(msg.h);
+		screenSize.socket = {'w':msg.w, 'h':msg.h};
+		// console.log(screenSize.socket);
+		console.log(cols, rows);
 	},
 	'passAlong':function(socket,msg){
 		for(var i=0;i<allSockets.length;i++){

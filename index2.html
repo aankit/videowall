@@ -38,7 +38,9 @@
 		var initializeServer = {
 			'type': 'first',
 			'windowX': window.innerWidth,
-			'windowY': window.innerHeight
+			'windowY': window.innerHeight,
+			'rows': rows,
+			'cols': cols
 		}
 		ws.send(JSON.stringify(initializeServer));
 		//console.log(source);
