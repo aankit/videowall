@@ -83,6 +83,10 @@
 
 		//need to change the video
 		v.addEventListener('ended', function(){
+			ws.send(JSON.stringify({
+				'type':'next',
+				'thing': 'hello'
+			}));
 			console.log("it ended!");
 		},false);
 

@@ -105,8 +105,11 @@ var socketHandlers = {
 	},
 	'size': function(socket, msg){
 		screenSize.socket = {'w':msg.w, 'h':msg.h};
-		// console.log(screenSize.socket);
-		console.log(cols, rows);
+		//console.log(screenSize.socket);
+		//console.log(cols, rows);
+	},
+	'next': function(socket, msg){
+		
 	},
 	'passAlong':function(socket,msg){
 		for(var i=0;i<allSockets.length;i++){
@@ -128,6 +131,10 @@ var socketHandlers = {
 		}
 	}
 };
+
+var sequencer = function(socket){
+	//needs to know the mode we're in - or at least decide the mode we are in
+}
 
 ////////////////////////////
 ////////////////////////////
