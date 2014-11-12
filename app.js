@@ -12,22 +12,24 @@ var HTTP_port = process.env.PORT || 8000; // the port our server will run on
 //build screen manager
 var screens = {};
 var screenNum;
-//These are all the videos
-var vidLibrary = {
-	'turntable_one.mov': 0,
-	'turntable_two.mov': 0,
-	'turntable_three.mov': 0,
-	'turntable_four.mov': 0,
-	'seal_one.mp4': 0,
-	'NSF_Science_Nation.mp4': 0,
-	'antarctica.mp4': 0
-};
-var turns = 0;
-var allScreens = false;
-var played = [];
 var screenSize = {};
 var rows;
 var cols;
+
+//These are all the videos
+var vidLibrary = {
+	'turntable_one.mov',
+	'turntable_two.mov',
+	'turntable_three.mov',
+	'turntable_four.mov',
+	'seal_one.mp4',
+	'NSF_Science_Nation.mp4',
+	'antarctica.mp4'
+};
+var turns = 0;
+var checkedIn = [];
+var checkedOut = [];
+var allScreens = false;
 
 // we are only using one route, which simply returns the file the browser asks for
 app.use('/current', function(req, res, next){
@@ -84,7 +86,7 @@ socketServer.on('connection',function(socket){
 		}
 	});
 	allSockets.push(socket);
-	screens.socket = screenNum;
+	screens[socket] = screenNum; //screenNum set in the HTTP GET request
 });
 
 ////////////////////////////
@@ -104,7 +106,7 @@ var socketHandlers = {
 			if(allSockets[i]===socket){
 				//look up what I should be playing on this screen
 				var scr = screens.socket;
-				var toPlay = pickVid();
+				var toPlay = checkoutVid();
 				console.log(toPlay);
 				var vidData = {
 					'videoSource': toPlay,
@@ -114,11 +116,6 @@ var socketHandlers = {
 				allSockets[i].send(JSON.stringify(vidData));
 			}
 		}
-	},
-	'size': function(socket, msg){
-		screenSize.socket = {'w':msg.w, 'h':msg.h};
-		//console.log(screenSize.socket);
-		//console.log(cols, rows);
 	},
 	'next': function(socket, msg){
 		vidID = msg.vidID;
@@ -130,9 +127,14 @@ var socketHandlers = {
 		// if (turns==vidLibrary.length){
 		// 	turns = 0;
 		// 	allScreens = true;
-		// 	toPlay = pickVid();
+		// 	toPlay = checkoutVid();
 		// }
 		// return toPlay
+	},
+	'size': function(socket, msg){
+		screenSize[socket] = {'w':msg.w, 'h':msg.h};
+		//console.log(screenSize.socket);
+		//console.log(cols, rows);
 	},
 	'passAlong':function(socket,msg){
 		for(var i=0;i<allSockets.length;i++){
@@ -155,17 +157,22 @@ var socketHandlers = {
 	}
 };
 
-var pickVid = function(){
-	
+//
+var checkoutVid = function(socket){
 	vidLibrary.splice(played,played.length);
-	console.log(notPlayed);
-	var vid = notPlayed[Math.floor(Math.random()*vidLibrary.length)];
-	played.push(vid);
-	if (notPlayed.length===0){
-		notPlayed = played;
+	console.log(checkedIn);
+	var vid = checkedIn[Math.floor(Math.random()*vidLibrary.length)];
+	checkedOut.push(vid);
+	if (checkedIn.length===0){
+		vidLibrary.push(checkedOut) //recall books, no fines here, just magically bring everyone back.
+		playBig();//time to play big video
 	}
 	return vid;
 };
+
+var playBig = function(){
+
+}
 
 ////////////////////////////
 ////////////////////////////
