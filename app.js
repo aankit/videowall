@@ -17,7 +17,7 @@ var rows;
 var cols;
 
 //These are all the videos
-var vidLibrary = {
+var vidLibrary = [
 	'turntable_one.mov',
 	'turntable_two.mov',
 	'turntable_three.mov',
@@ -25,9 +25,8 @@ var vidLibrary = {
 	'seal_one.mp4',
 	'NSF_Science_Nation.mp4',
 	'antarctica.mp4'
-};
+];
 var turns = 0;
-var checkedIn = [];
 var checkedOut = [];
 var allScreens = false;
 
@@ -74,6 +73,7 @@ socketServer.on('connection',function(socket){
 	//console.log(screens);
 	socket.on('message',function(data){
 		var msg = JSON.parse(data);
+		console.log(msg);
 		if(socketHandlers[msg.type]) socketHandlers[msg.type](socket,msg);
 	});
 
@@ -95,31 +95,25 @@ socketServer.on('connection',function(socket){
 
 var socketHandlers = {
 	'update': function(socket, msg){
-		//console.log(msg.someShit);
-		// console.log(msg.duration);
-		// console.log(msg.current);
+		screenSize[socket] = {'w':msg.w, 'h':msg.h};
+		console.log(msg.duration);
+		console.log(msg.current);
 	},
 	'first': function(socket, msg){
 		rows = msg.rows;
 		cols = msg.cols;
+		screenSize[socket] = {'w':msg.w, 'h':msg.h};
 		for(var i=0;i<allSockets.length;i++){
 			if(allSockets[i]===socket){
 				//look up what I should be playing on this screen
-				var scr = screens.socket;
-				var toPlay = checkoutVid();
-				console.log(toPlay);
-				var vidData = {
-					'videoSource': toPlay,
-					'mode': allScreens,
-					'screenNum': scr
-				};
-				allSockets[i].send(JSON.stringify(vidData));
+				var toPlay = checkoutVid(socket, msg);
+				play(toPlay, allSockets[i], screenSize);
 			}
 		}
 	},
 	'next': function(socket, msg){
-		vidID = msg.vidID;
-		console.log(vidID);
+		var toPlay = checkoutVid(socket, msg);
+		play(toPlay, socket, screenSize);
 		// //let's do one video full screen every turn through the video library
 		// //to do this we will increment a counter that resets...
 		// turns ++;
@@ -131,11 +125,12 @@ var socketHandlers = {
 		// }
 		// return toPlay
 	},
-	'size': function(socket, msg){
-		screenSize[socket] = {'w':msg.w, 'h':msg.h};
+	'resize': function(socket, msg){
+		
 		//console.log(screenSize.socket);
 		//console.log(cols, rows);
 	},
+	//might need this for fast screen resizing
 	'passAlong':function(socket,msg){
 		for(var i=0;i<allSockets.length;i++){
 			if(allSockets[i]===socket){
@@ -157,22 +152,31 @@ var socketHandlers = {
 	}
 };
 
-//
-var checkoutVid = function(socket){
-	vidLibrary.splice(played,played.length);
-	console.log(checkedIn);
-	var vid = checkedIn[Math.floor(Math.random()*vidLibrary.length)];
+//what can we do with socket & msg? right now we are handing things out randomly
+var checkoutVid = function(socket, msg){
+	console.log(vidLibrary);
+	var vid = vidLibrary[Math.floor(Math.random()*vidLibrary.length)];
 	checkedOut.push(vid);
-	if (checkedIn.length===0){
-		vidLibrary.push(checkedOut) //recall books, no fines here, just magically bring everyone back.
-		playBig();//time to play big video
+	vidLibrary.splice(checkedOut,checkedOut.length);
+	if (vidLibrary.length===0){
+		vidLibrary.push(checkedOut); //recall books, no fines here, just magically bring everyone back.
+		// playBig();//time to play big video
 	}
 	return vid;
 };
 
 var playBig = function(){
 
-}
+};
+
+//probably should send screen size not allScreens boolean
+var play = function(toPlay, socket, screenSize){
+	var vidData = {
+		'videoSource': toPlay,
+		'mode': screenSize,
+	};
+	socket.send(JSON.stringify(vidData));
+};
 
 ////////////////////////////
 ////////////////////////////

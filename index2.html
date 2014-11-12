@@ -85,7 +85,6 @@
 		v.addEventListener('ended', function(){
 			ws.send(JSON.stringify({
 				'type':'next',
-				'vidID': 'hello'
 			}));
 			console.log("it ended!");
 		},false);
@@ -98,22 +97,18 @@
 	 
 	function draw(v,c,cw,ch) {
 		if(v.paused || v.ended)	return false;
-		var w = window.outerWidth;
-	    var h = window.outerHeight;
-	    var sizeData = {
-	    	'type': 'size',
-	    	'w': w,
-	    	'h': h
-	    };
-	    ws.send(JSON.stringify(sizeData));
-		var tempData = {
-			'type': 'update',
-			'duration': v.duration,
-			'current': v.currentTime
-		}
-		ws.send(JSON.stringify(tempData));
-		// c.scale(.5,.5);
-		console.log(cw, ch);
+		// var w = window.outerWidth;
+	 //    var h = window.outerHeight;
+		// //this can be used for more precise/between vid control, potentially allow from some trimming, etc.
+		// var updateData = {
+		// 	'type': 'update',
+	 //    	'w': w,
+	 //    	'h': h,
+		// 	'duration': v.duration,
+		// 	'current': v.currentTime
+		// };
+		//ws.send(JSON.stringify(updateData));
+		//c.scale(.5,.5);
 		c.drawImage(v,0,0,cw,ch);
 		setTimeout(draw,20,v,c,cw,ch);
 	}
