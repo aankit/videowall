@@ -12,8 +12,19 @@ var HTTP_port = process.env.PORT || 8000; // the port our server will run on
 //build screen manager
 var screens = {};
 var screenNum;
-var vidFiles = ['Sequence01.mov', 'Sequence02.mov', 'Sequence03.mov', 'Sequence04.mov'];
-var modes = ['all', 'single'];
+//These are all the videos
+var vidLibrary = {
+	'turntable_one.mov': 0,
+	'turntable_two.mov': 0,
+	'turntable_three.mov': 0,
+	'turntable_four.mov': 0,
+	'seal_one.mp4': 0,
+	'NSF_Science_Nation.mp4': 0,
+	'antarctica.mp4': 0
+};
+var turns = 0;
+var allScreens = false;
+var played = [];
 var screenSize = {};
 var rows;
 var cols;
@@ -93,10 +104,11 @@ var socketHandlers = {
 			if(allSockets[i]===socket){
 				//look up what I should be playing on this screen
 				var scr = screens.socket;
-				console.log(screens.socket);
+				var toPlay = pickVid();
+				console.log(toPlay);
 				var vidData = {
-					'videoSource': vidFiles[1],
-					'mode': 'all',
+					'videoSource': toPlay,
+					'mode': allScreens,
 					'screenNum': scr
 				};
 				allSockets[i].send(JSON.stringify(vidData));
@@ -109,7 +121,18 @@ var socketHandlers = {
 		//console.log(cols, rows);
 	},
 	'next': function(socket, msg){
-		
+		vidID = msg.vidID;
+		console.log(vidID);
+		// //let's do one video full screen every turn through the video library
+		// //to do this we will increment a counter that resets...
+		// turns ++;
+		// //needs to know the mode we're in - or at least decide the mode we are in
+		// if (turns==vidLibrary.length){
+		// 	turns = 0;
+		// 	allScreens = true;
+		// 	toPlay = pickVid();
+		// }
+		// return toPlay
 	},
 	'passAlong':function(socket,msg){
 		for(var i=0;i<allSockets.length;i++){
@@ -132,9 +155,17 @@ var socketHandlers = {
 	}
 };
 
-var sequencer = function(socket){
-	//needs to know the mode we're in - or at least decide the mode we are in
-}
+var pickVid = function(){
+	
+	vidLibrary.splice(played,played.length);
+	console.log(notPlayed);
+	var vid = notPlayed[Math.floor(Math.random()*vidLibrary.length)];
+	played.push(vid);
+	if (notPlayed.length===0){
+		notPlayed = played;
+	}
+	return vid;
+};
 
 ////////////////////////////
 ////////////////////////////

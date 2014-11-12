@@ -68,7 +68,7 @@
 		canvas.height = ch;
 	 	
 		document.getElementById('movie').src = data.videoSource;
-		if(data.mode==='all'){
+		if(data.mode){
 			row = Math.floor(data.screenNum/cols)
 			col = data.screenNum-row*cols;
 			offsetX = -col*window.innerWidth;
@@ -85,7 +85,7 @@
 		v.addEventListener('ended', function(){
 			ws.send(JSON.stringify({
 				'type':'next',
-				'thing': 'hello'
+				'vidID': 'hello'
 			}));
 			console.log("it ended!");
 		},false);
